@@ -24,16 +24,19 @@ export function buildDateFilter(
   return filter;
 }
 
+// Hard cap so a client cannot request an unbounded page size (DoS guard)
+const MAX_LIMIT = 100;
+
 /**
  * Parse pagination params from query string values.
- * Returns skip count and numeric limit.
+ * Returns skip count and numeric limit (capped at MAX_LIMIT).
  */
 export function parsePagination(
   page?: unknown,
   limit?: unknown,
 ): { skip: number; limit: number; page: number } {
   const pageNum = Math.max(1, Number(page) || 1);
-  const limitNum = Math.max(1, Number(limit) || 20);
+  const limitNum = Math.min(Math.max(1, Number(limit) || 20), MAX_LIMIT);
   return {
     page: pageNum,
     limit: limitNum,

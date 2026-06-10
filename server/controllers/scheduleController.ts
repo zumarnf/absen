@@ -11,6 +11,31 @@ function getDayName(dayOfWeek: number): string {
   return days[dayOfWeek] || "Unknown";
 }
 
+// Run all shift capacity checks in parallel and return the first full slot
+// (or null when every slot still has capacity). Keeps original first-found
+// order since Promise.all preserves input order.
+async function findFullShiftSlot(
+  schedules: IScheduleShift[],
+  excludeUserId?: string,
+): Promise<{ dayOfWeek: number; shift: number; pos: number } | null> {
+  const checks = schedules.flatMap((scheduleItem) =>
+    scheduleItem.shifts.map(async (shift: number) => ({
+      dayOfWeek: scheduleItem.dayOfWeek,
+      shift,
+      pos: scheduleItem.pos,
+      hasCapacity: (await (Schedule as any).validateShiftCapacity(
+        scheduleItem.dayOfWeek,
+        shift,
+        scheduleItem.pos,
+        excludeUserId,
+      )) as boolean,
+    })),
+  );
+
+  const results = await Promise.all(checks);
+  return results.find((result) => !result.hasCapacity) ?? null;
+}
+
 // Validate schedules format
 function validateSchedulesFormat(schedules: IScheduleShift[]): boolean {
   return schedules.every(
@@ -60,22 +85,13 @@ export const createSchedule = asyncHandler(
     }
 
     // Validate shift capacity (max 3 users per shift per pos)
-    for (const schedule of schedules) {
-      for (const shift of schedule.shifts) {
-        const hasCapacity = await (Schedule as any).validateShiftCapacity(
-          schedule.dayOfWeek,
-          shift,
-          schedule.pos,
-        );
-
-        if (!hasCapacity) {
-          res.status(400).json({
-            success: false,
-            message: `Shift ${shift} pada hari ${getDayName(schedule.dayOfWeek)} di Pos ${schedule.pos} sudah penuh (maksimal 3 user)`,
-          });
-          return;
-        }
-      }
+    const fullSlot = await findFullShiftSlot(schedules);
+    if (fullSlot) {
+      res.status(400).json({
+        success: false,
+        message: `Shift ${fullSlot.shift} pada hari ${getDayName(fullSlot.dayOfWeek)} di Pos ${fullSlot.pos} sudah penuh (maksimal 3 user)`,
+      });
+      return;
     }
 
     // Deactivate existing active schedules for this user
@@ -185,23 +201,16 @@ export const updateSchedule = asyncHandler(
       }
 
       // Validate shift capacity (exclude current user)
-      for (const scheduleItem of schedules) {
-        for (const shift of scheduleItem.shifts) {
-          const hasCapacity = await (Schedule as any).validateShiftCapacity(
-            scheduleItem.dayOfWeek,
-            shift,
-            scheduleItem.pos,
-            schedule.userId.toString(),
-          );
-
-          if (!hasCapacity) {
-            res.status(400).json({
-              success: false,
-              message: `Shift ${shift} pada hari ${getDayName(scheduleItem.dayOfWeek)} di Pos ${scheduleItem.pos} sudah penuh (maksimal 3 user)`,
-            });
-            return;
-          }
-        }
+      const fullSlot = await findFullShiftSlot(
+        schedules,
+        schedule.userId.toString(),
+      );
+      if (fullSlot) {
+        res.status(400).json({
+          success: false,
+          message: `Shift ${fullSlot.shift} pada hari ${getDayName(fullSlot.dayOfWeek)} di Pos ${fullSlot.pos} sudah penuh (maksimal 3 user)`,
+        });
+        return;
       }
 
       schedule.schedules = schedules;
@@ -269,7 +278,8 @@ export const getAllSchedules = asyncHandler(
         .sort({ createdAt: -1 })
         .limit(limit)
         .skip(skip)
-        .populate("userId", "username nama role"),
+        .populate("userId", "username nama role")
+        .lean(),
       Schedule.countDocuments(query),
     ]);
 

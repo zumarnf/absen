@@ -171,7 +171,8 @@ export const listIncoming = asyncHandler(
     const userId = req.user?.userId;
     const coverages = await ShiftCoverage.find({ targetUserId: userId })
       .sort({ createdAt: -1 })
-      .populate(POPULATE_USERS as never);
+      .populate(POPULATE_USERS as never)
+      .lean();
     res.status(200).json({ success: true, data: coverages });
   },
 );
@@ -184,7 +185,8 @@ export const listOutgoing = asyncHandler(
     const userId = req.user?.userId;
     const coverages = await ShiftCoverage.find({ requesterId: userId })
       .sort({ createdAt: -1 })
-      .populate(POPULATE_USERS as never);
+      .populate(POPULATE_USERS as never)
+      .lean();
     res.status(200).json({ success: true, data: coverages });
   },
 );

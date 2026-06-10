@@ -156,7 +156,8 @@ export const getAllCourseSchedules = asyncHandler(
         .sort({ createdAt: -1 })
         .limit(limit)
         .skip(skip)
-        .populate("userId", "username nama role"),
+        .populate("userId", "username nama role")
+        .lean(),
       CourseSchedule.countDocuments(query),
     ]);
 

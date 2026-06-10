@@ -73,15 +73,33 @@ app.use((_req: Request, res: Response) => {
 // Global error handler (must have 4 params for Express to recognize it)
 app.use(
   (
-    err: Error & { status?: number },
+    err: Error & { status?: number; code?: number },
     _req: Request,
     res: Response,
     _next: NextFunction,
   ) => {
     console.error("Error:", err.message);
-    res.status(err.status || 500).json({
+
+    // Map known operational errors to 400 without leaking DB internals
+    if (err.name === "CastError") {
+      res.status(400).json({ success: false, message: "Invalid ID format" });
+      return;
+    }
+    if (err.name === "ValidationError") {
+      res.status(400).json({ success: false, message: err.message });
+      return;
+    }
+    if (err.code === 11000) {
+      res.status(400).json({ success: false, message: "Duplicate entry" });
+      return;
+    }
+
+    const status = err.status || 500;
+    res.status(status).json({
       success: false,
-      message: err.message || "Internal server error",
+      // Never echo raw internal error messages on unexpected 5xx errors
+      message:
+        status >= 500 ? "Internal server error" : err.message || "Bad request",
       error: process.env.NODE_ENV === "development" ? err.stack : undefined,
     });
   },

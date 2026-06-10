@@ -116,7 +116,8 @@ export const getHistory = asyncHandler(
         .sort({ date: -1 })
         .limit(limit)
         .skip(skip)
-        .populate("userId", "username nama role"),
+        .populate("userId", "username nama role")
+        .lean(),
       Attendance.countDocuments(query),
     ]);
 
@@ -188,7 +189,8 @@ export const getUserAttendance = asyncHandler(
         .sort({ date: -1 })
         .limit(limit)
         .skip(skip)
-        .populate("userId", "username nama role"),
+        .populate("userId", "username nama role")
+        .lean(),
       Attendance.countDocuments(query),
     ]);
 
@@ -228,7 +230,8 @@ export const getAllAttendance = asyncHandler(
         .sort({ date: -1 })
         .limit(limit)
         .skip(skip)
-        .populate("userId", "username nama role"),
+        .populate("userId", "username nama role")
+        .lean(),
       Attendance.countDocuments(query),
     ]);
 
