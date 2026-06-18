@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AuthRequest } from "../types";
-import { getJwtSecret } from "../utils/jwt";
+import { getJwtSecret, AUTH_COOKIE_NAME } from "../utils/jwt";
 
 interface DecodedToken extends JwtPayload {
   userId: string;
@@ -15,16 +15,19 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // EventSource cannot send custom headers, so we accept a ?token= query
-    // param ONLY for SSE stream routes. Restricting it elsewhere prevents
-    // tokens from leaking into access logs / proxy history for normal APIs.
+    // Primary transport is the httpOnly auth cookie. The Authorization header
+    // is still accepted for backward compatibility / non-browser clients.
     const headerToken = req.header("Authorization")?.replace("Bearer ", "");
+    const cookieToken = req.cookies?.[AUTH_COOKIE_NAME] as string | undefined;
+    // EventSource cannot send custom headers; the cookie covers it, but we keep
+    // a ?token= fallback ONLY for SSE stream routes. Restricting it elsewhere
+    // prevents tokens from leaking into access logs / proxy history.
     const isStreamRoute = req.baseUrl.startsWith("/api/stream");
     const queryToken =
       isStreamRoute && typeof req.query.token === "string"
         ? req.query.token
         : undefined;
-    const token = headerToken || queryToken;
+    const token = headerToken || cookieToken || queryToken;
 
     if (!token) {
       res.status(401).json({
@@ -43,7 +46,7 @@ export const authenticate = async (
     };
 
     next();
-  } catch (error) {
+  } catch {
     res.status(401).json({
       success: false,
       message: "Invalid or expired token",

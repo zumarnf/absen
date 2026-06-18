@@ -5,6 +5,16 @@ import { AuthRequest, IScheduleShift } from "../types";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { parsePagination, buildPaginationMeta } from "../utils/queryHelpers";
 
+// Typed view of the Schedule model's custom static (declared in the schema).
+type ScheduleStatics = {
+  validateShiftCapacity: (
+    dayOfWeek: number,
+    shift: number,
+    pos: number,
+    excludeUserId?: string,
+  ) => Promise<boolean>;
+};
+
 // Helper function to get day name
 function getDayName(dayOfWeek: number): string {
   const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
@@ -23,12 +33,14 @@ async function findFullShiftSlot(
       dayOfWeek: scheduleItem.dayOfWeek,
       shift,
       pos: scheduleItem.pos,
-      hasCapacity: (await (Schedule as any).validateShiftCapacity(
+      hasCapacity: await (
+        Schedule as unknown as ScheduleStatics
+      ).validateShiftCapacity(
         scheduleItem.dayOfWeek,
         shift,
         scheduleItem.pos,
         excludeUserId,
-      )) as boolean,
+      ),
     })),
   );
 

@@ -35,7 +35,7 @@ const attendanceSchema = new Schema<IAttendance>(
       type: [shiftAttendanceSchema],
       required: [true, "At least one shift is required"],
       validate: {
-        validator: function (shifts: any[]) {
+        validator: function (shifts: { shift: number; pos: number }[]) {
           // Harus ada minimal 1 shift
           if (shifts.length === 0) return false;
           // Setiap shift harus valid

@@ -41,7 +41,7 @@ const scheduleSchema = new Schema<ISchedule>(
       type: [scheduleShiftSchema],
       required: true,
       validate: {
-        validator: function (schedules: any[]) {
+        validator: function (schedules: { dayOfWeek: number }[]) {
           // Cek tidak ada dayOfWeek yang duplicate
           const days = schedules.map((s) => s.dayOfWeek);
           return days.length === new Set(days).size;
@@ -69,7 +69,7 @@ scheduleSchema.statics.validateShiftCapacity = async function (
   pos: number,
   excludeUserId?: string
 ) {
-  const query: any = {
+  const query: Record<string, unknown> = {
     isActive: true,
     "schedules.dayOfWeek": dayOfWeek,
     "schedules.shifts": shift,

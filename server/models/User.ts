@@ -8,7 +8,7 @@ interface IUserMethods {
 }
 
 // Create a new Model type with methods
-type UserModel = Model<IUser, {}, IUserMethods>;
+type UserModel = Model<IUser, Record<string, never>, IUserMethods>;
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {

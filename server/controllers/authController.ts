@@ -3,7 +3,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { AuthRequest, LoginCredentials, RegisterData } from "../types";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { getJwtSecret, getJwtExpiresIn } from "../utils/jwt";
+import {
+  getJwtSecret,
+  getJwtExpiresIn,
+  getCookieMaxAgeMs,
+  getAuthCookieOptions,
+  AUTH_COOKIE_NAME,
+} from "../utils/jwt";
 
 // Generate JWT Token
 const generateToken = (
@@ -13,6 +19,14 @@ const generateToken = (
 ): string => {
   return jwt.sign({ userId, username, role }, getJwtSecret(), {
     expiresIn: getJwtExpiresIn(),
+  });
+};
+
+// Send the JWT as an httpOnly cookie so it is never exposed to client-side JS.
+const setTokenCookie = (res: Response, token: string): void => {
+  res.cookie(AUTH_COOKIE_NAME, token, {
+    ...getAuthCookieOptions(),
+    maxAge: getCookieMaxAgeMs(),
   });
 };
 
@@ -121,10 +135,30 @@ export const login = asyncHandler(
 
     const token = generateToken(user._id.toString(), user.username, user.role);
 
+    // Primary transport: httpOnly cookie. Token is still returned in the body
+    // for backward compatibility, but the client no longer persists it.
+    setTokenCookie(res, token);
+
     res.status(200).json({
       success: true,
       message: "Login successful",
       data: { token, user: formatUserResponse(user) },
+    });
+  },
+);
+
+// @route   POST /api/auth/logout
+// @desc    Clear the auth cookie
+// @access  Public (clearing a cookie must work even with an expired token)
+export const logout = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    // Attributes must match those used when setting the cookie, otherwise the
+    // browser will not remove it.
+    res.clearCookie(AUTH_COOKIE_NAME, getAuthCookieOptions());
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
     });
   },
 );

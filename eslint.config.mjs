@@ -12,7 +12,23 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Compiled backend output — never lint generated JS.
+    "dist/**",
   ]),
+  {
+    rules: {
+      // Allow intentionally unused identifiers prefixed with "_"
+      // (e.g. Express error-handler signatures that require 4 args).
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

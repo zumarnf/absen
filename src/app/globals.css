@@ -1,0 +1,332 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ============================================================
+   Editorial Monochrome — warm ink/stone, hairline borders,
+   no gradients, near-zero shadow. Color is a scarce resource.
+   ============================================================ */
+:root {
+  --radius: 0.625rem;
+
+  /* Canvas & ink */
+  --background: #fafaf9; /* warm bone */
+  --foreground: #1c1917; /* stone-900, never pure black */
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  /* Ink as the single "primary" — used sparingly for CTA */
+  --primary: #1c1917;
+  --primary-foreground: #fafaf9;
+
+  /* Quiet surfaces */
+  --secondary: #f5f5f4; /* stone-100 */
+  --secondary-foreground: #1c1917;
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c; /* stone-500 */
+  --accent: #f5f5f4;
+  --accent-foreground: #1c1917;
+
+  --destructive: #9f2f2d; /* washed brick red */
+
+  /* Hairlines */
+  --border: #e7e5e4; /* stone-200 */
+  --input: #e7e5e4;
+  --ring: #1c1917;
+
+  /* Monochrome chart ramp (ink -> stone) */
+  --chart-1: #1c1917;
+  --chart-2: #44403c;
+  --chart-3: #78716c;
+  --chart-4: #a8a29e;
+  --chart-5: #d6d3d1;
+
+  /* Sidebar = ink canvas */
+  --sidebar: #1c1917;
+  --sidebar-foreground: #d6d3d1;
+  --sidebar-primary: #fafaf9;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: #292524;
+  --sidebar-accent-foreground: #fafaf9;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #d6d3d1;
+}
+
+.dark {
+  --background: #1c1917;
+  --foreground: #f5f5f4;
+  --card: #232020;
+  --card-foreground: #f5f5f4;
+  --popover: #232020;
+  --popover-foreground: #f5f5f4;
+  --primary: #f5f5f4;
+  --primary-foreground: #1c1917;
+  --secondary: #292524;
+  --secondary-foreground: #f5f5f4;
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --accent: #292524;
+  --accent-foreground: #f5f5f4;
+  --destructive: #e7807d;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: #a8a29e;
+  --chart-1: #f5f5f4;
+  --chart-2: #d6d3d1;
+  --chart-3: #a8a29e;
+  --chart-4: #78716c;
+  --chart-5: #44403c;
+  --sidebar: #161312;
+  --sidebar-foreground: #d6d3d1;
+  --sidebar-primary: #f5f5f4;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: #292524;
+  --sidebar-accent-foreground: #f5f5f4;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #a8a29e;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/40;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Editorial serif display — tight tracking, tight leading */
+  .font-display {
+    font-family: var(--font-serif);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    font-weight: 500;
+  }
+  /* Tabular figures for stats/tables */
+  .nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+/* ============================================================
+   Status tags — pill, uppercase, wide tracking, muted pastels.
+   The only place saturated-ish color is allowed.
+   ============================================================ */
+@layer components {
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tag-neutral {
+    background: #f5f5f4;
+    color: #57534e;
+    border-color: #e7e5e4;
+  }
+  .tag-success {
+    background: #edf3ec;
+    color: #346538;
+    border-color: #d6e4d5;
+  }
+  .tag-info {
+    background: #e8f0fb;
+    color: #1f5c93;
+    border-color: #d3e1f3;
+  }
+  .tag-warning {
+    background: #fbf3db;
+    color: #8a5a00;
+    border-color: #f0e3bf;
+  }
+  .tag-danger {
+    background: #fdebec;
+    color: #9f2f2d;
+    border-color: #f3d6d6;
+  }
+}
+
+/* ===== Animation Keyframes ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Animation Utilities (transform/opacity only) ===== */
+.animate-fade-in-up {
+  animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.loader-dot {
+  animation: dotPulse 0.6s ease-in-out infinite;
+}
+
+/* Stagger delays */
+.delay-1 {
+  animation-delay: 0.05s;
+}
+.delay-2 {
+  animation-delay: 0.1s;
+}
+.delay-3 {
+  animation-delay: 0.15s;
+}
+.delay-4 {
+  animation-delay: 0.2s;
+}
+.delay-5 {
+  animation-delay: 0.25s;
+}
+.delay-6 {
+  animation-delay: 0.3s;
+}
+
+/* ===== Card Hover — hairline emphasis, near-zero diffuse shadow ===== */
+.card-hover {
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.card-hover:hover {
+  border-color: #d6d3d1;
+  box-shadow: 0 2px 8px rgba(28, 25, 23, 0.04);
+  transform: translateY(-1px);
+}
+
+/* ===== Table Row Hover (warm) ===== */
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+.table-row-hover:hover {
+  background-color: #fafaf9;
+}
+
+/* ===== Smooth Focus Ring ===== */
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  transition: box-shadow 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
