@@ -86,7 +86,8 @@ auth cookie travels automatically.
 # 1. Install dependencies
 npm install
 
-# 2. Create a .env file (see the variables below)
+# 2. Copy the env template and fill in your own values
+cp .env.example .env
 
 # 3. (Optional) seed an initial admin
 npm run seed
@@ -99,24 +100,27 @@ Then open <http://localhost:3000>.
 
 #### Environment variables (`.env`)
 
+Copy [`.env.example`](.env.example) to `.env` and fill in your own values — every value is left
+blank so nothing real is committed. Expected format is shown in the comments:
+
 ```env
 # Server
-PORT=5000
-NODE_ENV=development
+PORT=                 # e.g. 5000
+NODE_ENV=             # development | production
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/absensi_logistik
+MONGODB_URI=          # your MongoDB connection string
 
 # Auth — generate a unique secret: openssl rand -base64 48
-JWT_SECRET=replace_with_a_random_string_at_least_32_chars
-JWT_EXPIRE=1d
+JWT_SECRET=           # random string, at least 32 characters
+JWT_EXPIRE=           # e.g. 1d, 12h
 
 # CORS / cookie
-FRONTEND_URL=http://localhost:3000
-# COOKIE_SAMESITE=lax   # set to "none" for cross-site deploys (forces Secure)
+FRONTEND_URL=         # e.g. http://localhost:3000
+# COOKIE_SAMESITE=    # lax (default) | none for cross-site deploys (forces Secure)
 
 # Frontend → backend API base URL
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=  # e.g. http://localhost:5000/api
 ```
 
 > The server **refuses to start** with a missing, too-short, or placeholder `JWT_SECRET` — this
@@ -208,7 +212,8 @@ memakai `withCredentials` sehingga cookie auth terkirim otomatis.
 # 1. Install dependency
 npm install
 
-# 2. Buat file .env (lihat variabel di bawah)
+# 2. Salin template env, lalu isi nilainya sendiri
+cp .env.example .env
 
 # 3. (Opsional) seed admin awal
 npm run seed
@@ -221,24 +226,27 @@ Lalu buka <http://localhost:3000>.
 
 #### Variabel environment (`.env`)
 
+Salin [`.env.example`](.env.example) ke `.env` lalu isi nilainya sendiri — semua nilai sengaja
+dikosongkan agar tidak ada data nyata yang ikut ter-commit. Format yang diharapkan ada di komentar:
+
 ```env
 # Server
-PORT=5000
-NODE_ENV=development
+PORT=                 # mis. 5000
+NODE_ENV=             # development | production
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/absensi_logistik
+MONGODB_URI=          # connection string MongoDB Anda
 
 # Auth — buat secret unik: openssl rand -base64 48
-JWT_SECRET=ganti_dengan_string_acak_minimal_32_karakter
-JWT_EXPIRE=1d
+JWT_SECRET=           # string acak, minimal 32 karakter
+JWT_EXPIRE=           # mis. 1d, 12h
 
 # CORS / cookie
-FRONTEND_URL=http://localhost:3000
-# COOKIE_SAMESITE=lax   # set "none" untuk deploy beda domain (memaksa Secure)
+FRONTEND_URL=         # mis. http://localhost:3000
+# COOKIE_SAMESITE=    # lax (default) | none untuk deploy beda domain (memaksa Secure)
 
 # Base URL API frontend → backend
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=  # mis. http://localhost:5000/api
 ```
 
 > Server **menolak start** bila `JWT_SECRET` kosong, terlalu pendek, atau berupa placeholder —
