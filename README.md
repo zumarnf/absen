@@ -11,7 +11,8 @@
 ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose%209-47A248?logo=mongodb&logoColor=white)
 ![Vitest](https://img.shields.io/badge/tested%20with-Vitest-6E9F18?logo=vitest&logoColor=white)
-![Tests](https://img.shields.io/badge/integration%20tests-18%20passing-success)
+![Tests](https://img.shields.io/badge/integration%20tests-25%20passing-success)
+[![CI](https://github.com/zumarnf/absen/actions/workflows/ci.yml/badge.svg)](https://github.com/zumarnf/absen/actions/workflows/ci.yml)
 
 **🌐 [English](#-english) · [Bahasa Indonesia](#-bahasa-indonesia)**
 
@@ -150,9 +151,10 @@ in-memory MongoDB (`mongodb-memory-server`) — no external database needed.
 npm test
 ```
 
-Current coverage (18 tests): login & cookie handling, admin-only registration (no privilege
+Current coverage (25 tests): login & cookie handling, admin-only registration (no privilege
 escalation), profile auth, the SSE-only `?token=` restriction, IDOR protection on
-schedules/courses/coverage, admin-only route gating, and login brute-force rate limiting.
+schedules/courses/coverage, admin-only route gating, login brute-force rate limiting,
+attendance check-in (validation & same-day duplicate guard), and shift capacity limits.
 
 ### 🔒 Security Highlights
 
@@ -276,9 +278,10 @@ MongoDB in-memory (`mongodb-memory-server`) — tanpa perlu database eksternal.
 npm test
 ```
 
-Cakupan saat ini (18 tes): login & penanganan cookie, registrasi admin-only (tanpa privilege
+Cakupan saat ini (25 tes): login & penanganan cookie, registrasi admin-only (tanpa privilege
 escalation), auth profil, pembatasan `?token=` khusus SSE, proteksi IDOR pada
-jadwal/kuliah/pengganti, gating route admin-only, dan rate limit brute-force login.
+jadwal/kuliah/pengganti, gating route admin-only, rate limit brute-force login,
+check-in absensi (validasi & cegah duplikat hari sama), dan batas kapasitas shift.
 
 ### 🔒 Sorotan Keamanan
 
