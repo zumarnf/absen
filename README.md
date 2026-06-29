@@ -11,7 +11,7 @@
 ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose%209-47A248?logo=mongodb&logoColor=white)
 ![Vitest](https://img.shields.io/badge/tested%20with-Vitest-6E9F18?logo=vitest&logoColor=white)
-![Tests](https://img.shields.io/badge/integration%20tests-25%20passing-success)
+![Tests](https://img.shields.io/badge/tests-42%20passing-success)
 [![CI](https://github.com/zumarnf/absen/actions/workflows/ci.yml/badge.svg)](https://github.com/zumarnf/absen/actions/workflows/ci.yml)
 
 **🌐 [English](#-english) · [Bahasa Indonesia](#-bahasa-indonesia)**
@@ -144,17 +144,20 @@ Each side can be run alone with the `:frontend` / `:backend` variants (e.g. `npm
 
 ### 🧪 Testing
 
-Backend integration tests run the **real Express app** through HTTP (Supertest) against an
-in-memory MongoDB (`mongodb-memory-server`) — no external database needed.
+Tests run as two Vitest projects: a **backend** suite that drives the **real Express app** over
+HTTP (Supertest) against an in-memory MongoDB (`mongodb-memory-server`, no external database),
+and a **frontend** suite of fast unit tests for pure helpers and Zod schemas.
 
 ```bash
 npm test
 ```
 
-Current coverage (25 tests): login & cookie handling, admin-only registration (no privilege
-escalation), profile auth, the SSE-only `?token=` restriction, IDOR protection on
-schedules/courses/coverage, admin-only route gating, login brute-force rate limiting,
-attendance check-in (validation & same-day duplicate guard), and shift capacity limits.
+Current coverage (42 tests). Backend: login & cookie handling, admin-only registration (no
+privilege escalation), profile auth, the SSE-only `?token=` restriction, IDOR protection on
+schedules/courses/coverage, admin-only route gating, login brute-force rate limiting, attendance
+check-in (validation & same-day duplicate guard), and shift capacity limits. Frontend:
+course/shift conflict detection (incl. midnight wrap-around), date & shift-range formatting, and
+auth form schema validation.
 
 ### 🔒 Security Highlights
 
@@ -278,10 +281,12 @@ MongoDB in-memory (`mongodb-memory-server`) — tanpa perlu database eksternal.
 npm test
 ```
 
-Cakupan saat ini (25 tes): login & penanganan cookie, registrasi admin-only (tanpa privilege
-escalation), auth profil, pembatasan `?token=` khusus SSE, proteksi IDOR pada
-jadwal/kuliah/pengganti, gating route admin-only, rate limit brute-force login,
-check-in absensi (validasi & cegah duplikat hari sama), dan batas kapasitas shift.
+Cakupan saat ini (42 tes). Backend: login & penanganan cookie, registrasi admin-only (tanpa
+privilege escalation), auth profil, pembatasan `?token=` khusus SSE, proteksi IDOR pada
+jadwal/kuliah/pengganti, gating route admin-only, rate limit brute-force login, check-in absensi
+(validasi & cegah duplikat hari sama), dan batas kapasitas shift. Frontend: deteksi bentrok
+kuliah/shift (termasuk lewat tengah malam), format tanggal & rentang shift, serta validasi schema
+form auth.
 
 ### 🔒 Sorotan Keamanan
 
