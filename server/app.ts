@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { apiLimiter } from "./middleware/rateLimiter";
+import { csrfProtection } from "./middleware/csrf";
 
 // Import routes
 import authRoutes from "./routes/authRoutes";
@@ -34,6 +35,11 @@ export const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+
+  // CSRF guard for state-changing requests (double-submit cookie). Mounted
+  // after cookieParser so req.cookies is populated; safe methods and the login
+  // bootstrap are exempt inside the middleware.
+  app.use(csrfProtection);
 
   // Health check endpoint
   app.get("/health", (_req: Request, res: Response) => {

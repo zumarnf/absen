@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import request from "supertest";
 import type { Application } from "express";
 import { createApp } from "../app";
-import { seedUser, loginCookie } from "./helpers";
+import { seedUser, authHeaders } from "./helpers";
 
 let app: Application;
 
@@ -21,11 +21,11 @@ describe("POST /api/attendance/checkin", () => {
 
   it("checks in with valid shifts and computes totalHours", async () => {
     const user = await seedUser({ username: "checkin1" });
-    const cookie = await loginCookie(app, user.username, user.password);
+    const headers = await authHeaders(app, user.username, user.password);
 
     const res = await request(app)
       .post("/api/attendance/checkin")
-      .set("Cookie", cookie)
+      .set(headers)
       .send({ shifts: [{ shift: 1, pos: 1 }] });
 
     expect(res.status).toBe(201);
@@ -36,18 +36,18 @@ describe("POST /api/attendance/checkin", () => {
 
   it("rejects a second check-in on the same day", async () => {
     const user = await seedUser({ username: "checkin2" });
-    const cookie = await loginCookie(app, user.username, user.password);
+    const headers = await authHeaders(app, user.username, user.password);
     const body = { shifts: [{ shift: 2, pos: 1 }] };
 
     const first = await request(app)
       .post("/api/attendance/checkin")
-      .set("Cookie", cookie)
+      .set(headers)
       .send(body);
     expect(first.status).toBe(201);
 
     const second = await request(app)
       .post("/api/attendance/checkin")
-      .set("Cookie", cookie)
+      .set(headers)
       .send(body);
     expect(second.status).toBe(400);
     expect(second.body.message).toMatch(/already checked in/i);
@@ -55,11 +55,11 @@ describe("POST /api/attendance/checkin", () => {
 
   it("rejects an out-of-range shift", async () => {
     const user = await seedUser({ username: "checkin3" });
-    const cookie = await loginCookie(app, user.username, user.password);
+    const headers = await authHeaders(app, user.username, user.password);
 
     const res = await request(app)
       .post("/api/attendance/checkin")
-      .set("Cookie", cookie)
+      .set(headers)
       .send({ shifts: [{ shift: 9, pos: 1 }] });
 
     expect(res.status).toBe(400);
@@ -67,11 +67,11 @@ describe("POST /api/attendance/checkin", () => {
 
   it("rejects an empty shifts array", async () => {
     const user = await seedUser({ username: "checkin4" });
-    const cookie = await loginCookie(app, user.username, user.password);
+    const headers = await authHeaders(app, user.username, user.password);
 
     const res = await request(app)
       .post("/api/attendance/checkin")
-      .set("Cookie", cookie)
+      .set(headers)
       .send({ shifts: [] });
 
     expect(res.status).toBe(400);

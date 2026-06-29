@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import request from "supertest";
 import type { Application } from "express";
 import { createApp } from "../app";
-import { seedUser, loginCookie } from "./helpers";
+import { seedUser, loginCookie, authHeaders } from "./helpers";
 
 let app: Application;
 
@@ -72,11 +72,11 @@ describe("POST /api/auth/register (admin-only)", () => {
 
   it("rejects a non-admin caller with 403 (no privilege escalation)", async () => {
     const user = await seedUser({ username: "regular", role: "user" });
-    const cookie = await loginCookie(app, user.username, user.password);
+    const headers = await authHeaders(app, user.username, user.password);
 
     const res = await request(app)
       .post("/api/auth/register")
-      .set("Cookie", cookie)
+      .set(headers)
       .send({
         username: "escalated",
         password: "password123",
@@ -89,11 +89,11 @@ describe("POST /api/auth/register (admin-only)", () => {
 
   it("allows an admin to create a new user", async () => {
     const admin = await seedUser({ username: "boss", role: "admin" });
-    const cookie = await loginCookie(app, admin.username, admin.password);
+    const headers = await authHeaders(app, admin.username, admin.password);
 
     const res = await request(app)
       .post("/api/auth/register")
-      .set("Cookie", cookie)
+      .set(headers)
       .send({
         username: "created",
         password: "password123",

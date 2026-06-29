@@ -10,6 +10,11 @@ import {
   getAuthCookieOptions,
   AUTH_COOKIE_NAME,
 } from "../utils/jwt";
+import {
+  CSRF_COOKIE_NAME,
+  generateCsrfToken,
+  getCsrfCookieOptions,
+} from "../utils/csrf";
 
 // Generate JWT Token
 const generateToken = (
@@ -26,6 +31,15 @@ const generateToken = (
 const setTokenCookie = (res: Response, token: string): void => {
   res.cookie(AUTH_COOKIE_NAME, token, {
     ...getAuthCookieOptions(),
+    maxAge: getCookieMaxAgeMs(),
+  });
+};
+
+// Issue a CSRF token in a readable cookie (double-submit pattern). The client
+// echoes it back in the X-CSRF-Token header on state-changing requests.
+const setCsrfCookie = (res: Response): void => {
+  res.cookie(CSRF_COOKIE_NAME, generateCsrfToken(), {
+    ...getCsrfCookieOptions(),
     maxAge: getCookieMaxAgeMs(),
   });
 };
@@ -138,6 +152,8 @@ export const login = asyncHandler(
     // Primary transport: httpOnly cookie. Token is still returned in the body
     // for backward compatibility, but the client no longer persists it.
     setTokenCookie(res, token);
+    // Pair it with a readable CSRF token for the double-submit guard.
+    setCsrfCookie(res);
 
     res.status(200).json({
       success: true,
@@ -155,6 +171,7 @@ export const logout = asyncHandler(
     // Attributes must match those used when setting the cookie, otherwise the
     // browser will not remove it.
     res.clearCookie(AUTH_COOKIE_NAME, getAuthCookieOptions());
+    res.clearCookie(CSRF_COOKIE_NAME, getCsrfCookieOptions());
 
     res.status(200).json({
       success: true,

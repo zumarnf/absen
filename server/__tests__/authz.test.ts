@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import request from "supertest";
 import type { Application } from "express";
 import { createApp } from "../app";
-import { seedUser, loginCookie } from "./helpers";
+import { seedUser, loginCookie, authHeaders } from "./helpers";
 import Schedule from "../models/Schedule";
 import CourseSchedule from "../models/CourseSchedule";
 import ShiftCoverage from "../models/ShiftCoverage";
@@ -104,16 +104,16 @@ describe("Shift coverage authorization (POST /api/shift-coverages/:id/approve)",
       status: "pending",
     });
 
-    const outsiderCookie = await loginCookie(app, outsider.username, outsider.password);
+    const outsiderHeaders = await authHeaders(app, outsider.username, outsider.password);
     const denied = await request(app)
       .post(`/api/shift-coverages/${coverage._id.toString()}/approve`)
-      .set("Cookie", outsiderCookie);
+      .set(outsiderHeaders);
     expect(denied.status).toBe(403);
 
-    const targetCookie = await loginCookie(app, target.username, target.password);
+    const targetHeaders = await authHeaders(app, target.username, target.password);
     const approved = await request(app)
       .post(`/api/shift-coverages/${coverage._id.toString()}/approve`)
-      .set("Cookie", targetCookie);
+      .set(targetHeaders);
     expect(approved.status).toBe(200);
     expect(approved.body.data.status).toBe("approved");
   });
