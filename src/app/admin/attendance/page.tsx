@@ -64,6 +64,15 @@ export default function AdminAttendancePage() {
     handleGeneratePDF,
   } = useAdminAttendancePage();
 
+  // Warm the lazy export dialog and the heavy PDF libs on intent (hover/focus)
+  // so the click feels instant. Guarded so nothing is bundled for SSR.
+  // See: vercel-react-best-practices > bundle-preload.
+  const preloadExport = () => {
+    if (typeof window === "undefined") return;
+    void import("@/features/attendance/components/export-pdf-dialog");
+    void import("@/features/attendance/pdf-generator");
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -83,6 +92,8 @@ export default function AdminAttendancePage() {
             <Button
               variant="outline"
               onClick={() => setExportDialogOpen(true)}
+              onMouseEnter={preloadExport}
+              onFocus={preloadExport}
               className="rounded-lg transition-all duration-200 "
             >
               <Download className="h-4 w-4 mr-2" />

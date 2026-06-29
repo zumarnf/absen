@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Compiled backend output — never lint generated JS.
     "dist/**",
+    // Vendored tooling/skill helper scripts — not application source.
+    ".claude/**",
   ]),
   {
     rules: {
