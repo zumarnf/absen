@@ -8,6 +8,10 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  // Use the automatic JSX runtime so component tests don't need to import React.
+  esbuild: {
+    jsx: "automatic",
+  },
   test: {
     coverage: {
       provider: "v8",
@@ -41,8 +45,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: "frontend",
-          environment: "node",
+          // jsdom so React component tests can render; pure-helper tests run
+          // fine under it too.
+          environment: "jsdom",
           include: ["src/**/*.test.{ts,tsx}"],
+          setupFiles: ["src/test/setup.ts"],
         },
       },
     ],
